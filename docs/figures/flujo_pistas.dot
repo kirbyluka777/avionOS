@@ -1,0 +1,19 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.25", ranksep="0.35", splines=ortho, fontname="DejaVu Sans", label="Flujo de sincronización para reservar una pista", labelloc=t, fontsize=16];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, color="#355070", fillcolor="#eef4f8", margin="0.15,0.09"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#526777", arrowsize=0.75];
+  start [label="Hilo de vuelo solicita pista"];
+  lock [label="Adquirir mutex con unique_lock"];
+  queue [label="Insertar solicitud en cola\n(ticket, prioridad y hora)", fillcolor="#fff1d6"];
+  wait [label="condition_variable.wait(lock, predicado)", fillcolor="#fff1d6"];
+  pred [shape=diamond, label="¿Es el mejor\nsolicitante y hay\npista libre?", fillcolor="#f5f0fa"];
+  reserve [label="Marcar pista ocupada\ny retirar solicitud\n(sección crítica)", fillcolor="#e8f5e9"];
+  release [label="Liberar mutex y realizar maniobra"];
+  unlock [label="Readquirir mutex y marcar\nla pista como libre"];
+  notify [label="Liberar mutex y notify_all()"];
+  end [label="Vuelo continúa / termina"];
+  start -> lock -> queue -> wait -> pred;
+  pred -> wait [label="No", constraint=false];
+  pred -> reserve [label="Sí"];
+  reserve -> release -> unlock -> notify -> end;
+}

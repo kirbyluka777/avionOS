@@ -1,0 +1,26 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.3", ranksep="0.35", splines=ortho, fontname="DejaVu Sans", label="Traducción de direcciones y atención de fallos de página", labelloc=t, fontsize=16];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, color="#355070", fillcolor="#eef4f8", margin="0.15,0.09"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#526777", arrowsize=0.75];
+  va [label="Dirección virtual VA"];
+  split [label="page = VA / pageSize\noffset = VA % pageSize"];
+  lookup [label="Consultar tabla de páginas"];
+  present [shape=diamond, label="¿Página presente?", fillcolor="#f5f0fa"];
+  hit [label="Obtener marco físico"];
+  fault [label="Fallo de página", fillcolor="#fce8e6"];
+  empty [shape=diamond, label="¿Hay marco libre?", fillcolor="#f5f0fa"];
+  choose [label="Elegir víctima: FIFO / LRU / Clock", fillcolor="#fff1d6"];
+  write [label="Escribir víctima en swap.bin"];
+  load [label="Cargar página requerida\ndesde swap o inicializar"];
+  map [label="Actualizar tabla y bits de control"];
+  physical [label="PA = marco × pageSize + offset", fillcolor="#e8f5e9"];
+  va -> split -> lookup -> present;
+  present -> hit [label="Sí"];
+  present -> fault [label="No"];
+  fault -> empty;
+  empty -> load [label="Sí"];
+  empty -> choose [label="No"];
+  choose -> write -> load;
+  load -> map -> hit;
+  hit -> physical;
+}

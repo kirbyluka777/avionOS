@@ -1,0 +1,27 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", pad="0.22", nodesep="0.3", ranksep="0.55", splines=ortho, fontname="DejaVu Sans", label="Arquitectura implementada - Entrega 2", labelloc=t, fontsize=16];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, color="#355070", fillcolor="#eef4f8", margin="0.14,0.09"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#526777", arrowsize=0.75];
+  subgraph cluster_radar {
+    label="Subsistema de radar y memoria virtual"; color="#8aa3b8"; style="rounded"; fontname="DejaVu Sans"; fontsize=12;
+    r1 [label="Hilos productores\nRadar de entrada", fillcolor="#e7f1fb"];
+    r2 [label="Buffer circular finito\nSemáforos + mutex", fillcolor="#fff1d6"];
+    r3 [label="Hilo consumidor\nTorre de control", fillcolor="#e7f1fb"];
+    r4 [label="MemoryManager / MMU\nTraducción de direcciones", fillcolor="#e8f5e9"];
+    r5 [label="Tabla de páginas + marcos RAM\nFIFO / LRU / Clock", fillcolor="#e8f5e9"];
+    r6 [label="swap_radar.bin\nIntercambio binario", fillcolor="#fce8e6"];
+    r1 -> r2 [label="push"];
+    r2 -> r3 [label="pop"];
+    r3 -> r4 [label="guardar traza"];
+    r4 -> r5 [label="MMU"];
+    r5 -> r6 [label="desalojo / recuperación"];
+  }
+  subgraph cluster_runway {
+    label="Subsistema de pistas"; color="#8aa3b8"; style="rounded"; fontname="DejaVu Sans"; fontsize=12;
+    f1 [label="Hilos de aeronaves\nSolicitudes de pista", fillcolor="#e7f1fb"];
+    f2 [label="RunwayManager\nmutex + unique_lock + CV\ncola con aging", fillcolor="#fff1d6"];
+    f3 [label="Pistas exclusivas\nocupada / libre", fillcolor="#fce8e6"];
+    f1 -> f2 [label="solicitar acceso"];
+    f2 -> f3 [label="reserva atómica"];
+  }
+}
